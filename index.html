@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도전! 속담 왕 (홈 버튼 & 점수판 포함)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Jua', sans-serif;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 95vh;
+            user-select: none;
+        }
+
+        /* 🏠 왼쪽 위 홈 버튼 스타일 */
+        #home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 12px 20px;
+            font-size: 1.3rem;
+            background-color: #747d8c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-family: 'Jua', sans-serif;
+            display: none; /* 초기 화면에서는 숨김 */
+            transition: background 0.2s;
+        }
+
+        #home-btn:hover {
+            background-color: #57606f;
+        }
+
+        /* 오른쪽 위 난이도 변경 버튼 */
+        #mode-toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            font-size: 1.3rem;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-family: 'Jua', sans-serif;
+            display: none; /* 초기 화면에서는 숨김 */
+        }
+
+        #mode-toggle-btn.normal-btn {
+            background-color: #2ecc71;
+        }
+
+        /* 메인 컨테이너 */
+        .quiz-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            width: 95%;
+            max-width: 900px;
+            text-align: center;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        /* 모드 선택 카드 버튼 */
+        .role-selection {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .role-card {
+            background: #f1f2f6;
+            border: 3px solid #dfe4ea;
+            border-radius: 15px;
+            padding: 30px;
+            width: 200px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .role-card:hover {
+            transform: translateY(-5px);
+            background: #e4e7eb;
+            border-color: #a4b0be;
+        }
+
+        .role-card h2 { margin: 10px 0; color: #2f3542; }
+        .role-card p { color: #747d8c; font-size: 1rem; margin: 0; line-height: 1.4; }
+
+        /* 배지 및 진행도 */
+        .badge {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 20px;
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        .badge.normal { background-color: #2ecc71; }
+        .badge.hard { background-color: #e74c3c; }
+
+        .progress-text {
+            font-size: 1.1rem;
+            color: #a4b0be;
+            margin-bottom: 10px;
+        }
+
+        /* 퀴즈 텍스트 스타일 */
+        .quiz-text {
+            font-size: 3rem;
+            line-height: 1.6;
+            margin-bottom: 35px;
+            color: #2f3542;
+            word-break: keep-all;
+        }
+
+        .hidden-answer {
+            color: #ff4757;
+            background-color: #f1f2f6;
+            padding: 2px 12px;
+            border-radius: 8px;
+            border-bottom: 4px dashed #ff4757;
+        }
+
+        .revealed-answer {
+            color: #2f3542;
+            background-color: #ffeaa7;
+            padding: 2px 12px;
+            border-radius: 8px;
+        }
+
+        .meaning-box {
+            font-size: 1.8rem;
+            color: #57606f;
+            background-color: #f1f2f6;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            word-break: keep-all;
+            line-height: 1.5;
+        }
+
+        .meaning-box.show { opacity: 1; }
+
+        .btn-group { margin-top: 40px; }
+
+        .action-btn {
+            font-family: 'Jua', sans-serif;
+            font-size: 2rem;
+            padding: 15px 50px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            background-color: #3498db;
+            color: white;
+            transition: transform 0.1s;
+        }
+
+        .action-btn:active { transform: scale(0.96); }
+
+        /* 모둠 점수판 스타일 */
+        .group-score-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            width: 95%;
+            max-width: 900px;
+            margin-top: 10px;
+        }
+
+        .group-card {
+            background: white;
+            padding: 15px 10px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.04);
+            text-align: center;
+            border: 2px solid #ced6e0;
+        }
+
+        .group-name {
+            font-size: 1.4rem;
+            color: #57606f;
+            margin-bottom: 10px;
+        }
+
+        .score-display {
+            font-size: 2.2rem;
+            color: #2f3542;
+            margin-bottom: 12px;
+        }
+
+        .score-btns {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .score-btn {
+            font-family: 'Jua', sans-serif;
+            font-size: 1.2rem;
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        .btn-minus { background-color: #e74c3c; }
+        .btn-plus { background-color: #2ecc71; }
+    </style>
+</head>
+<body>
+
+    <button id="home-btn" onclick="goHome()">🏠 홈으로</button>
+
+    <button id="mode-toggle-btn" onclick="toggleMode()">🔥 하드 버전 (중고등)</button>
+
+    <div class="quiz-container" id="role-screen">
+        <h1 style="font-size: 3.5rem; margin-bottom: 10px; color: #2f3542;">💡 도전! 속담 왕</h1>
+        <p style="font-size: 1.5rem; color: #747d8c; margin-bottom: 40px;">원하는 모드를 선택해 주세요.</p>
+        
+        <div class="role-selection">
+            <div class="role-card" onclick="selectRole('student')">
+                <span style="font-size: 4rem;">🎒</span>
+                <h2>학생용</h2>
+                <p>혼자서 차근차근<br>문제를 풀며 공부해요</p>
+            </div>
+            <div class="role-card" onclick="selectRole('classroom')">
+                <span style="font-size: 4rem;">🏫</span>
+                <h2>교실용</h2>
+                <p>모둠 점수판과 함께<br>다 같이 퀴즈 대결을 해요</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="quiz-container" id="quiz-screen" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 250px; margin: 0 auto;">
+            <div id="difficulty-badge" class="badge normal">노말 (초등)</div>
+            <div id="quiz-progress" class="progress-text">남은 문제: --</div>
+        </div>
+        
+        <div class="quiz-text" id="quiz-question"></div>
+        <div class="meaning-box" id="quiz-meaning"></div>
+
+        <div class="btn-group">
+            <button class="action-btn" id="main-action-btn" onclick="handleNext()">정답 확인</button>
+        </div>
+    </div>
+
+    <div class="group-score-board" id="score-board" style="display: none;">
+        <div class="group-card">
+            <div class="group-name">1모둠</div>
+            <div class="score-display" id="score-1">0</div>
+            <div class="score-btns">
+                <button class="score-btn btn-minus" onclick="changeScore(1, -1)">-</button>
+                <button class="score-btn btn-plus" onclick="changeScore(1, 1)">+</button>
+            </div>
+        </div>
+        <div class="group-card">
+            <div class="group-name">2모둠</div>
+            <div class="score-display" id="score-2">0</div>
+            <div class="score-btns">
+                <button class="score-btn btn-minus" onclick="changeScore(2, -1)">-</button>
+                <button class="score-btn btn-plus" onclick="changeScore(2, 1)">+</button>
+            </div>
+        </div>
+        <div class="group-card">
+            <div class="group-name">3모둠</div>
+            <div class="score-display" id="score-3">0</div>
+            <div class="score-btns">
+                <button class="score-btn btn-minus" onclick="changeScore(3, -1)">-</button>
+                <button class="score-btn btn-plus" onclick="changeScore(3, 1)">+</button>
+            </div>
+        </div>
+        <div class="group-card">
+            <div class="group-name">4모둠</div>
+            <div class="score-display" id="score-4">0</div>
+            <div class="score-btns">
+                <button class="score-btn btn-minus" onclick="changeScore(4, -1)">-</button>
+                <button class="score-btn btn-plus" onclick="changeScore(4, 1)">+</button>
+            </div>
+        </div>
+        <div class="group-card">
+            <div class="group-name">5모둠</div>
+            <div class="score-display" id="score-5">0</div>
+            <div class="score-btns">
+                <button class="score-btn btn-minus" onclick="changeScore(5, -1)">-</button>
+                <button class="score-btn btn-plus" onclick="changeScore(5, 1)">+</button>
+            </div>
+        </div>
+        <div class="group-card">
+            <div class="group-name">6모둠</div>
+            <div class="score-display" id="score-6">0</div>
+            <div class="score-btns">
+                <button class="score-btn btn-minus" onclick="changeScore(6, -1)">-</button>
+                <button class="score-btn btn-plus" onclick="changeScore(6, 1)">+</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = {
+            normal: [
+                { front: "가는 말이 고와야 ", back: "오는 말이 곱다.", meaning: "내가 남에게 좋게 말해야 남도 나에게 좋게 말한다는 뜻" },
+                { front: "개구리 ", back: "올챙이 적 생각 못 한다.", meaning: "형편이 좋아진 뒤에 지난날의 어렵던 시절을 잊는다는 뜻" },
+                { front: "소 잃고 ", back: "외양간 고친다.", meaning: "이미 일을 그르친 뒤에 뉘우쳐도 소용없다는 뜻" },
+                { front: "백지장도 ", back: "맞들면 낫다.", meaning: "아무리 쉬운 일이라도 서로 힘을 합하면 훨씬 쉽다는 뜻" },
+                { front: "발 없는 말이 ", back: "천 리 간다.", meaning: "말은 순식간에 멀리 퍼지므로 늘 말조심을 해야 한다는 뜻" },
+                { front: "금강산도 ", back: "식후경.", meaning: "아무리 재미있는 일이라도 배가 불러야 즐겁다는 뜻" },
+                { front: "뛰는 놈 위에 ", back: "나는 놈 있다.", meaning: "아무리 재주가 뛰어나도 그보다 더 뛰어난 사람이 있다는 뜻" },
+                { front: "세 살 버릇 ", back: "여든까지 간다.", meaning: "어릴 때 몸에 밴 나쁜 버릇은 늙어서도 고치기 어렵다는 뜻" },
+                { front: "우물가에서 ", back: "숭늉 찾는다.", meaning: "일의 순서도 모르고 성급하게 서두른다는 뜻" },
+                { front: "천 리 길도 ", back: "한 걸음부터.", meaning: "모든 일은 시작이 중요하며 차근차근 해나가야 한다는 뜻" },
+                { front: "호랑이도 제 말 하면 ", back: "온다.", meaning: "마침 이야기하고 있는데 그 사람이 나타났을 때 쓰는 말" },
+                { front: "고래 싸움에 ", back: "새우 등 터진다.", meaning: "강한 자들의 싸움에 아무 상관 없는 약한 자가 피해를 입는다는 뜻" },
+                { front: "낮말은 새가 듣고 ", back: "밤말은 쥐가 듣는다.", meaning: "아무도 안 듣는 것 같아도 비밀은 없으니 늘 말조심하라는 뜻" },
+                { front: "누워서 ", back: "떡 먹기.", meaning: "하기가 매우 쉽고 수월한 일을 이르는 말" },
+                { front: "돌다리도 ", back: "두들겨 보고 건너라.", meaning: "잘 아는 일이라도 꼼꼼하게 확인하고 조심하라는 뜻" },
+                { front: "등잔 밑이 ", back: "어둡다.", meaning: "가까이 있는 것을 오히려 잘 찾아내지 못한다는 뜻" },
+                { front: "밑 빠진 독에 ", back: "물 붓기.", meaning: "아무리 힘을 들이고 노력해도 보람이 없는 일을 뜻함" },
+                { front: "서당 개 삼 년이면 ", back: "풍월을 읊는다.", meaning: "어떤 분야에 오래 있으면 자연스럽게 지식과 경험을 얻는다는 뜻" },
+                { front: "식은 죽 ", back: "먹기.", meaning: "매우 하기 쉬운 일을 비유적으로 이르는 말" },
+                { front: "아니 땐 굴뚝에 ", back: "연기 날까.", meaning: "원인이 없으면 결과가 있을 수 없음을 뜻함" },
+                { front: "앓던 이가 ", back: "빠진 것 같다.", meaning: "골치 아프던 일이 해결되어 속이 아주 시원하다는 뜻" },
+                { front: "어물전 망신은 ", back: "꼴뚜기가 시킨다.", meaning: "못난 한 사람이 전체의 명예를 망쳐놓음을 이르는 말" },
+                { front: "옷이 ", back: "날개다.", meaning: "좋은 옷을 입으면 사람이 훨씬 돋보이고 훌륭해 보인다는 뜻" },
+                { front: "원숭이도 ", back: "나무에서 떨어진다.", meaning: "아무리 일을 잘하는 사람도 가끔 실수를 할 때가 있다는 뜻" },
+                { front: "작은 고추가 ", back: "더 맵다.", meaning: "덩치가 작거나 나이가 어려도 능력이 뛰어날 수 있다는 뜻" },
+                { front: "종로에서 뺨 맞고 ", back: "한강에서 눈 흘긴다.", meaning: "욕을 당한 자리에서는 말 못 하고 엉뚱한 곳에서 화풀이함" },
+                { front: "쥐구멍에도 ", back: "볕 들 날 있다.", meaning: "아무리 힘든 처지에 있는 사람도 좋은 날이 올 수 있다는 뜻" },
+                { front: "짚신도 ", back: "짝이 있다.", meaning: "아무리 보잘것없는 사람이라도 제 짝은 다 있다는 뜻" },
+                { front: "티끌 모아 ", back: "태산.", meaning: "아무리 작은 것이라도 조금씩 모으면 큰 덩어리가 된다는 뜻" },
+                { front: "하늘이 무너져도 ", back: "솟아날 구멍이 있다.", meaning: "아무리 큰 재난이나 어려움에 처해도 빠져나갈 길은 있다는 뜻" },
+                { front: "꿩 먹고 ", back: "알 먹기.", meaning: "한 가지 일을 하여 두 가지 이상의 이익을 얻는다는 뜻" },
+                { front: "도둑이 ", back: "제 발 저린다.", meaning: "죄를 지은 사람이 마음이 불안해 스스로 드러내게 됨을 뜻함" },
+                { front: "마른하늘에 ", back: "날벼락.", meaning: "뜻하지 않은 상황에서 갑자기 입는 재난을 뜻함" },
+                { front: "매도 먼저 맞는 게 ", back: "낫다.", meaning: "어차피 겪어야 할 매나 어려운 일은 먼저 치르는 게 마음 편함" },
+                { front: "목구멍이 ", back: "포도청.", meaning: "먹고살기 위해서는 무슨 일이든 하지 않을 수 없음을 뜻함" },
+                { front: "바늘 도둑이 ", back: "소 도둑 된다.", meaning: "작은 나쁜 버릇을 고치지 않으면 나중에 큰 죄를 짓게 된다는 뜻" },
+                { front: "배보다 ", back: "배꼽이 더 크다.", meaning: "기본적인 것보다 부차적인 것에 비용이나 노력이 더 들어감" },
+                { front: "비 온 뒤에 ", back: "땅이 굳어진다.", meaning: "시련을 겪고 나면 생각이나 환경이 더 단단해진다는 뜻" },
+                { front: "사공이 많으면 ", back: "배가 산으로 간다.", meaning: "주장하는 사람이 너무 많으면 일이 제대로 진행되지 않는다는 뜻" },
+                { front: "수박 ", back: "겉 핥기.", meaning: "일의 속 내용은 모르고 겉만 대충 훑어보는 것을 뜻함" },
+                { front: "식은 죽 먹듯 ", back: "한다.", meaning: "어떤 일을 하기가 아주 쉽다는 뜻" },
+                { front: "십 년이면 ", back: "강산도 변한다.", meaning: "세월이 흐르면 세상의 모든 것이 다 변하게 됨을 뜻함" },
+                { front: "아는 길도 ", back: "물어 가라.", meaning: "잘 아는 일이라도 조심하여 실수 없게 확인하라는 뜻" },
+                { front: "얌전한 고양이가 ", back: "부뚜막에 먼저 올라간다.", meaning: "겉으로는 얌전해 보이는 사람이 딴짓을 하거나 실속을 차림" },
+                { front: "열 번 찍어 ", back: "안 넘어가는 나무 없다.", meaning: "아무리 어려운 일도 끈기 있게 계속 노력하면 이루어진다는 뜻" },
+                { front: "오르지 못할 나무는 ", back: "쳐다보지도 마라.", meaning: "자신의 능력 밖의 일은 처음부터 무리하게 욕심내지 마라는 뜻" },
+                { front: "우물 안 ", back: "개구리.", meaning: "넓은 세상의 형편을 모르고 저만 잘난 줄 아는 사람을 뜻함" },
+                { front: "윗물이 맑아야 ", back: "아랫물이 맑다.", meaning: "윗사람이 바르게 행동해야 아랫사람도 바르게 행동한다는 뜻" },
+                { front: "자라 보고 놀란 가슴 ", back: "솥뚜껑 보고 놀란다.", meaning: "어떤 일에 한번 크게 놀라면 비슷한 것만 봐도 겁을 먹는다는 뜻" },
+                { front: "작은 고추가 ", back: "맵다.", meaning: "덩치는 작아도 재주나 능력이 다부진 사람을 뜻함" },
+                { front: "피는 물보다 ", back: "진하다.", meaning: "혈육, 즉 가족 간의 정이나 끌림이 매우 강함을 뜻함" },
+                { front: "하나를 보면 ", back: "열을 안다.", meaning: "부분적인 행동 하나만 봐도 그 사람의 전체를 짐작할 수 있음" },
+                { front: "하룻강아지 ", back: "범 무서운 줄 모른다.", meaning: "철없이 함부로 덤비는 사람을 비유하는 뜻" },
+                { front: "한 귀로 듣고 ", back: "한 귀로 흘린다.", meaning: "남이 주는 충고나 말을 마음 깊이 담아두지 않고 무시함" },
+                { front: "똥 묻은 개가 ", back: "겨 묻은 개 나무란다.", meaning: "자신에게 더 큰 흠이 있으면서 남의 작은 흠을 탓함을 뜻함" },
+                { front: "구슬이 서 말이라도 ", back: "꿴 보배다.", meaning: "아무리 좋은 재능이나 재물이 있어도 쓸모 있게 다듬어야 가치가 됨" },
+                { front: "그림의 ", back: "떡.", meaning: "바라만 보았지 실제로 이용하거나 차지할 수 없는 것을 뜻함" },
+                { front: "까마귀 날자 ", back: "배 떨어진다.", meaning: "아무 관계 없는 일이 우연히 동시에 일어나 의심을 받게 됨" },
+                { front: "꿩 대신 ", back: "닭.", meaning: "적당한 것이 없을 때 그와 비슷한 것으로 대신한다는 뜻" },
+                { front: "다된 밥에 ", back: "재 뿌리기.", meaning: "거의 다 완성된 일을 마지막에 망쳐버리는 행동을 뜻함" },
+                { front: "닭 잡아먹고 ", back: "오리발 내민다.", meaning: "자기가 저지른 나쁜 일을 숨기려고 엉뚱한 수단으로 속임" },
+                { front: "도랑 치고 ", back: "가재 잡는다.", meaning: "일의 순서가 맞아 한 가지 일로 두 가지 이익을 얻음을 뜻함" },
+                { front: "독 안에 든 ", back: "쥐.", meaning: "아무리 도망치려 해도 도망칠 수 없는 막다른 처지를 뜻함" },
+                { front: "돌다리도 ", back: "두들겨 보고 건넌다.", meaning: "매사에 안전하게 확인하고 행동하라는 조상의 지혜" },
+                { front: "동에 번쩍 ", back: "서에 번쩍.", meaning: "이곳저곳에 몹시 바쁘게 드나듦을 비유하는 말" },
+                { front: "두 손뼉이 맞아야 ", back: "소리가 난다.", meaning: "서로 뜻이 맞거나 협조해야 일이 이루어진다는 뜻" },
+                { front: "든 자리는 몰라도 ", back: "난 자리는 안다.", meaning: "사람이 있을 때는 모르다가 떠나고 나면 빈자리가 크게 느껴짐" },
+                { front: "마파람에 ", back: "게 눈 감추듯.", meaning: "음식을 매우 빨리 맛있게 먹어 치우는 모습을 뜻함" },
+                { front: "말 한마디로 ", back: "천 냥 빚을 갚는다.", meaning: "말을 조리 있고 좋게 하면 큰 어려움도 해결할 수 있다는 뜻" },
+                { front: "모르는 게 ", back: "약이다.", meaning: "알면 오히려 걱정이나 근심이 생겨 모르는 편이 낫다는 뜻" },
+                { front: "무소식이 ", back: "희소식이다.", meaning: "아무 소식이 없는 것은 무사히 잘 지내고 있다는 증거라는 뜻" },
+                { front: "물에 빠지면 ", back: "지푸라기라도 잡는다.", meaning: "위급한 처지에 빠지면 아무리 보잘것없는 것에라도 의지하려 함" },
+                { front: "미운 놈 ", back: "떡 하나 더 준다.", meaning: "미운 사람일수록 더 후하게 대접해 감정을 누그러뜨리라는 뜻" },
+                { front: "바람 없는 거리에 ", back: "먼지 날까.", meaning: "원인이 없으면 결과가 있을 수 없음을 뜻함" },
+                { front: "벼룩의 ", back: "간을 내어 먹는다.", meaning: "극히 적은 이익을 부당하게 빼앗음을 이르는 뜻" },
+                { front: "병 주고 ", back: "약 준다.", meaning: "다른 사람에게 해를 입혀놓고 나중에 도와주는 척함을 뜻함" },
+                { front: "보기 좋은 떡이 ", back: "먹기도 좋다.", meaning: "겉모양이 좋은 것이 내용도 실속 있고 좋다는 뜻" },
+                { front: "부처님 손바닥 ", back: "안이다.", meaning: "아무리 벗어나려고 애써도 결국 넓은 테두리를 못 벗어남" },
+                { front: "빈 수레가 ", back: "요란하다.", meaning: "실속 없는 사람이 겉으로 더 아는 체하고 떠들어댐을 뜻함" },
+                { front: "사촌이 땅을 사면 ", back: "배가 아프다.", meaning: "가까운 사람이 잘되는 것을 시기하고 질투함을 뜻함" },
+                { front: "산 넘어 ", back: "산.", meaning: "갈수록 어려움이나 곤란한 일이 계속 겹침을 뜻함" },
+                { front: "새 발의 ", back: "피.", meaning: "양이나 크기가 너무 작아 비교가 되지 않음을 뜻함" },
+                { front: "소문난 잔치에 ", back: "먹을 것 없다.", meaning: "겉만 화려하고 소문만 요란하지 실속은 별로 없음을 뜻함" },
+                { front: "속고 ", back: "속인다.", meaning: "세상살이에 서로 믿지 못하고 속이는 일이 많음을 뜻함" },
+                { front: "수풀을 헤쳐 ", back: "뱀을 잡는다.", meaning: "스스로 화를 자초하여 곤란한 상황을 만듦을 뜻함" },
+                { front: "신선놀음에 ", back: "도끼자루 썩는 줄 모른다.", meaning: "재미있는 일에 정신이 팔려 시간 가는 줄 모름을 뜻함" },
+                { front: "십 년 공부 ", back: "아미타불.", meaning: "오랫동안 정성을 들여 쌓은 공이 한순간에 헛수고가 됨" },
+                { front: "아 다르고 ", back: "어 다르다.", meaning: "말이라는 것은 같은 내용이라도 표현에 따라 느낌이 크게 다름" },
+                { front: "안방에 가면 ", back: "시어머니 말이 맞고, 부엌에 가면 며느리 말이 맞는다.", meaning: "양쪽의 주장이 다 나름대로 타당성이 있어 시비를 가리기 어려움" },
+                { front: "약방에 ", back: "감초.", meaning: "어떤 일이나 자리에 빠짐없이 꼭 끼어드는 사람이나 물건" },
+                { front: "고양이 쥐 ", back: "생각한다.", meaning: "속으로는 해칠 마음을 품고 있으면서 겉으로 걱정해 주는 척함" },
+                { front: "꼬리가 길면 ", back: "밟힌다.", meaning: "나쁜 일을 계속 반복하다 보면 결국에는 들키고 만다는 뜻" },
+                { front: "눈 가리고 ", back: "아웅 한다.", meaning: "얕은 수단으로 뻔히 드러날 사실을 일시적으로 속이려 함" },
+                { front: "달면 삼키고 ", back: "쓰면 뱉는다.", meaning: "자신의 이익만 챙기고 불리하면 쉽게 저버리는 이기적인 태도" },
+                { front: "똥 묻은 개가 ", back: "겨 묻은 개 나무란다.", meaning: "자신의 큰 허물은 모르고 남의 작은 허물을 탓함" },
+                { front: "마파람에 ", back: "게 눈 감추듯 한다.", meaning: "음식을 매우 순식간에 빨리 먹어 치움을 뜻함" },
+                { front: "발등에 ", back: "불이 떨어졌다.", meaning: "일이 몹시 급하게 닥쳐와 당장 해결해야 하는 처지" },
+                { front: "제 버릇 ", back: "개 못 준다.", meaning: "한번 나쁘게 든 버릇은 좀처럼 고치기 힘들다는 뜻" },
+                { front: "쥐구멍에 ", back: "볕 들 날 있다.", meaning: "고생만 하던 사람도 좋은 시기를 만나 성공할 날이 있음" },
+                { front: "칼로 ", back: "물 베기.", meaning: "싸우거나 다투어도 아무런 흔적 없이 쉽게 화해하게 됨을 뜻함" }
+            ],
+            hard: [
+                { front: "가랑비에 ", back: "옷 젖는 줄 모른다.", meaning: "작은 일이라도 계속 반복되면 무시하지 못할 정도로 커짐" },
+                { front: "가재는 ", back: "게 편이다.", meaning: "모양이나 형편이 비슷한 사람끼리 서로 편을 들고 도우며 살아감" },
+                { front: "갈수록 ", back: "태산.", meaning: "일이 진행될수록 점점 더 어려운 상황에 부딪힘을 뜻함" },
+                { front: "감나무 밑에서 ", back: "홍시 떨어지기를 기다린다.", meaning: "아무 노력도 하지 않으면서 좋은 결과가 오기만을 기다림" },
+                { front: "값싼 것이 ", back: "비지떡.", meaning: "값이 싼 물건은 대개 품질도 떨어지기 마련이라는 뜻" },
+                { front: "같은 값이면 ", back: "다홍치마.", meaning: "조건이 같다면 보기 좋고 더 나은 것을 선택한다는 뜻" },
+                { front: "개천에서 ", back: "용 난다.", meaning: "어려운 환경이나 시골에서 훌륭한 인물이 나옴을 이르는 말" },
+                { front: "거미도 ", back: "줄을 쳐야 벌레를 잡는다.", meaning: "무슨 일이든 준비와 노력이 있어야 결과를 얻을 수 있다는 뜻" },
+                { front: "겉 다르고 ", back: "속 다르다.", meaning: "겉으로 드러나는 행동과 마음속 품은 생각이 일치하지 않음" },
+                { front: "계란으로 ", back: "바위 치기.", meaning: "대항해도 도저히 이길 수 없는 상대와 무모하게 싸움을 뜻함" },
+                { front: "공든 탑이 ", back: "무너지랴.", meaning: "정성과 노력을 다해 한 일은 쉽게 헛되지 않고 좋은 결실을 맺음" },
+                { front: "구관이 ", back: "명관이다.", meaning: "경험이 많은 옛사람이나 이전에 하던 방식이 더 낫다는 뜻" },
+                { front: "구렁이 담 넘어가듯 ", back: "한다.", meaning: "일을 깔끔하게 처리하지 않고 슬그머니 흐지부지 넘겨버림" },
+                { front: "굴러온 돌이 ", back: "박힌 돌 뺀다.", meaning: "새로 들어온 사람이 원래 있던 사람을 밀어내고 자리를 차지함" },
+                { front: "기어 다니는 놈 위에 ", back: "뛰는 놈 있다.", meaning: "재주가 아무리 뛰어나도 더 높은 수준의 능력을 가진 자가 있음" },
+                { front: "길고 짧은 것은 ", back: "대보아야 안다.", meaning: "이기고 지는 결과나 재능의 우열은 실제 겨루어봐야 확실해짐" },
+                { front: "까마귀가 단 것을 먹으면 ", back: "소리가 변한다.", meaning: "주변 환경이나 조건이 바뀌면 본성도 변할 수 있음을 뜻함" },
+                { front: "꿩 굽은 ", back: "소리.", meaning: "겉으로는 그럴듯하지만 속으로는 딴속셈이나 불평이 섞인 말" },
+                { front: "남의 떡이 ", back: "더 커 보인다.", meaning: "자기가 가진 것보다 남이 가진 것이 부럽고 더 좋아 보임" },
+                { front: "닭 쫓던 개 ", back: "지붕만 쳐다본다.", meaning: "애써 노력하던 일이 허사가 되어 어찌할 도리 없이 낙담함" },
+                { front: "당달봉사 ", back: "거울 보기.", meaning: "아무 소용 없고 실속이 없는 헛된 행동을 비유하는 뜻" },
+                { front: "도둑놈에게 ", back: "열쇠 맡긴다.", meaning: "믿을 수 없는 사람에게 중요한 책임을 맡겨 화를 자초함" },
+                { front: "동족방뇨", back: "(언 발에 오줌 누기).", meaning: "임시변통은 될지언정 효력이 오래가지 못하고 사태가 더 악화됨" },
+                { front: "두 마리 토끼를 잡으려다 ", back: "다 놓친다.", meaning: "욕심을 부려 한 번에 여러 일을 하려다 모두 실패함을 뜻함" },
+                { front: "마당 쓸고 ", back: "돈 줍는다.", meaning: "한 가지 일로 매우 쉽게 두 가지 이익이나 좋은 결과를 얻음" },
+                { front: "말 타면 ", back: "경마 잡히고 싶다.", meaning: "사람의 욕심은 끝이 없어서 편해질수록 더 큰 편안함을 원함" },
+                { front: "망건 쓰자 ", back: "장 파한다.", meaning: "준비를 하다가 시간을 다 보내어 정작 중요한 기회를 놓침" },
+                { front: "모기 보고 ", back: "칼 빼기.", meaning: "사소한 일에 지나치게 크게 분개하거나 거창한 대책을 세움" },
+                { front: "무당이 제 굿 ", back: "못 한다.", meaning: "남의 일은 잘 처리하면서 정작 자기 일은 스스로 풀지 못함" },
+                { front: "문둥이 콧구멍에 ", back: "박힌 대추도 빼 먹는다.", meaning: "지독하게 인색하거나 탐욕스러워 약자의 작은 이익까지 빼앗음" },
+                { front: "물어도 ", back: "준치, 썩어도 준치.", meaning: "본래 훌륭한 가치를 지닌 것은 상하더라도 고유의 가치를 유지함" },
+                { front: "미꾸라지 한 마리가 ", back: "온 웅덩이를 흐린다.", meaning: "나쁜 사람 한 명이 전체 집단의 분위기를 망쳐놓음을 뜻함" },
+                { front: "바람 앞의 ", back: "등불.", meaning: "매우 위태로운 처지에 놓여 있어서 언제 망할지 모르는 상태" },
+                { front: "벼는 익을수록 ", back: "고개를 숙인다.", meaning: "교양이 있고 인격이 높은 사람일수록 겸손하게 행동한다는 뜻" },
+                { front: "보기 좋은 떡이 ", back: "먹기도 좋다.", meaning: "형식이나 겉모양이 잘 갖추어진 것이 내용도 훌륭함을 이르는 말" },
+                { front: "불난 집에 ", back: "부채질한다.", meaning: "어려운 처지에 놓인 사람을 돕지 않고 사태를 더 악화시킴" },
+                { front: "빛 좋은 ", back: "개살구.", meaning: "겉만 그럴듯하고 실속이나 내용물은 아주 보잘것없는 것을 뜻함" },
+                { front: "사촌이 땅을 사면 ", back: "배가 아프다.", meaning: "가까운 사람이 잘되는 것을 기뻐하지 않고 시기 질투함" },
+                { front: "상좌에 앉으면 ", back: "하좌가 그립다.", meaning: "지위가 높아지면 편할 것 같지만 나름의 걱정과 책임이 따름" },
+                { front: "서까래가 대들보 ", back: "된다.", meaning: "보잘것없던 아이나 물건이 크게 발전하여 중요한 역할을 하게 됨" },
+                { front: "소 닭 보듯, ", back: "닭 소 보듯.", meaning: "서로 아무런 관심도 없이 무덤덤하게 스쳐 지나감을 뜻함" },
+                { front: "속 빈 ", back: "강정.", meaning: "겉은 그럴듯하게 부풀어 있으나 속에는 아무 내용도 없음" },
+                { front: "쇠뿔도 ", back: "단김에 빼라.", meaning: "어떤 일을 하려고 마음먹었으면 망설이지 말고 즉시 처리하라" },
+                { front: "안 되려니와 ", back: "뒤로 넘어져도 코가 깨진다.", meaning: "운수가 사나우면 뜻밖의 황당한 상황에서도 큰 화를 입게 됨" },
+                { front: "양두", back: "구육.", meaning: "겉으로는 훌륭한 체하면서 속으로는 엉큼하고 부정한 짓을 함" },
+                { front: "어물전 망신은 ", back: "꼴뚜기가 시킨다.", meaning: "집단 내의 못난 존재가 전체의 명예를 떨어뜨릴 때 비유함" },
+                { front: "연못의 고기가 ", back: "그물을 두려워한다.", meaning: "죄를 지은 사람이 마음속 늘 불안에 떨며 살아감을 뜻함" },
+                { front: "오금아 ", back: "날 살려라.", meaning: "몹시 두렵거나 다급하여 정신없이 멀리 도망치는 모양을 뜻함" },
+                { front: "옷이 ", back: "날개다.", meaning: "좋은 옷을 차려입으면 사람의 품격이 완전히 달라 보임을 뜻함" },
+                { front: "우물가에서 ", back: "숭늉 찾는다.", meaning: "모든 일에는 순서가 있는 법인데 성급하게 결과만 바란다는 뜻" },
+                { front: "원수는 ", back: "외나무다리에서 만난다.", meaning: "피하고 싶은 사람이나 껄끄러운 대상을 공교롭게 외딴곳에서 마주침" },
+                { front: "원숭이도 ", back: "나무에서 떨어진다.", meaning: "아무리 뛰어난 전문가라도 실수하여 실패할 때가 있음을 뜻함" },
+                { front: "의붓자식 ", back: "떡 주듯 한다.", meaning: "겉으로는 주는 척하면서 속으로는 마지못해 인색하게 대함을 뜻함" },
+                { front: "이 빠진 호랑이 ", back: "신세.", meaning: "과거에는 권력이 강했으나 지금은 힘을 잃어 보잘것없어진 처지" },
+                { front: "인수", back: "거지.", meaning: "사람을 겉모양으로만 판단하여 대우하면 큰 실수를 범하게 됨" },
+                { front: "임도 보고 ", back: "뽕도 따고.", meaning: "한 가지 일을 도모하여 두 가지 목적을 동시에 달성함을 뜻함" },
+                { front: "자라 보고 놀란 가슴 ", back: "솥뚜껑 보고 놀란다.", meaning: "트라우마나 큰 충격을 겪으면 사소한 자극에도 극도로 긴장함" },
+                { front: "작은 고추가 ", back: "맵다.", meaning: "크기나 나이는 적을지라도 능력이 매서우니 얕잡아보지 마라" },
+                { front: "적반", back: "하장.", meaning: "잘못한 사람이 도리어 잘한 사람에게 화를 내며 나무라는 상황" },
+                { front: "절에 가서 ", back: "젓국 찾는다.", meaning: "도저히 얻을 수 없는 엉뚱한 곳에 가서 무언가를 구하려 함" },
+                { front: "종로에서 뺨 맞고 ", back: "한강에서 눈 흘긴다.", meaning: "화를 입은 곳에서 항의하지 못하고 엉뚱한 사람에게 분풀이함" },
+                { front: "주마", back: "가편.", meaning: "잘하는 사람을 격려하여 더 발전하도록 힘을 실어줌을 뜻함" },
+                { front: "죽 쑨 데 ", back: "개 준다.", meaning: "오랫동안 정성껏 준비한 일의 대가를 엉뚱한 사람이 가로챔" },
+                { front: "지렁이도 ", back: "밟으면 꿈틀한다.", meaning: "아무리 약하고 착한 존재라도 지나치게 무시하면 반발함" },
+                { front: "천 리 길도 ", back: "한 걸음부터.", meaning: "위대한 계획이나 장기 프로젝트도 작은 첫걸음이 기본이 됨" },
+                { front: "청출", back: "어람.", meaning: "제자나 후배가 스승이나 선배보다 학문이나 기술이 더 뛰어남" },
+                { front: "초록은 ", back: "동색.", meaning: "이름이나 모양은 약간 달라도 근본을 따져보면 같은 부류임" },
+                { front: "치지도 ", back: "도외시한다.", meaning: "마음속에 전혀 두지 않고 무시하거나 내버려 두어 신경 쓰지 않음" },
+                { front: "칠전", back: "팔기.", meaning: "아무리 여러 번 실패해도 굴하지 않고 끈기 있게 다시 일어남" },
+                { front: "콩 심은 데 콩 나고 ", back: "팥 심은 데 팥 난다.", meaning: "모든 일은 심은 원인에 따라 합당한 결과가 나타나기 마련임" },
+                { front: "타는 불에 ", back: "부채질한다.", meaning: "화를 내고 있는 사람을 자극하여 감정을 더 폭발하게 만듦" },
+                { front: "털어서 ", back: "먼지 안 나는 사람 없다.", meaning: "아무리 겉보기에 완벽해 보여도 깊이 파고들면 허물이 있음" },
+                { front: "토사", back: "구팽.", meaning: "필요할 때는 요긴하게 부리다가 쓸모가 없어지면 가혹하게 버림" },
+                { front: "핑계 없는 ", back: "무덤 없다.", meaning: "아무리 큰 실수를 저지른 사람이라도 변명할 이유는 다 있음" },
+                { front: "하늘의 ", back: "별 따기.", meaning: "이루기가 불가능하거나 실현될 가능성이 아주 희박함을 뜻함" },
+                { front: "한강에 ", back: "돌 던지기.", meaning: "지나치게 큰 대상에 작은 노력을 들여 아무런 효력도 내지 못함" },
+                { front: "한술 밥에 ", back: "배부르랴.", meaning: "처음부터 큰 만족을 얻을 수 없으니 꾸준히 인내해야 함" },
+                { front: "함흥", back: "차사.", meaning: "어떤 심부름을 간 사람이 한 번 떠난 뒤 소식이 감감무소식임" },
+                { front: "형만 한 ", back: "아우 없다.", meaning: "경험이나 연륜이 있는 선배가 대개 실력이나 지혜 면에서 나음" },
+                { front: "호랑이에게 물려 가도 ", back: "정신만 차리면 산다.", meaning: "아무리 위급한 위기 상황에 처하더라도 침착하면 극복할 수 있음" },
+                { front: "호연", back: "지기.", meaning: "도덕적으로 부끄러움이 없어 넓고 큰 굳센 기운을 품음을 뜻함" },
+                { front: "혹 떼러 갔다가 ", back: "혹 붙여 온다.", meaning: "문제를 해결하려다 오히려 상황이 꼬여 짐을 더 얹게 됨" },
+                { front: "화장실 들어갈 때 다르고 ", back: "나올 때 다르다.", meaning: "자신이 아쉬울 때 극진하다가 문제가 해결되면 태도가 급변함" },
+                { front: "황금 보기를 ", back: "돌 같이 하라.", meaning: "과도한 재물에 욕심을 두지 말고 청렴하고 올바르게 살아가라" },
+                { front: "까마귀 날자 ", back: "배 떨어진다.", meaning: "아무 관계 없는 두 사건이 공교롭게 동시에 일어나 의심받음" },
+                { front: "백문이 ", back: "불여일견.", meaning: "백 번 말로 듣는 것보다 한 번 직접 눈으로 보는 것이 확실함" },
+                { front: "유비", back: "무환.", meaning: "미리 준비를 꼼꼼하게 해두면 나중에 재난이나 걱정이 없음" },
+                { front: "읍참", back: "마속.", meaning: "공정한 법과 질서를 유지하기 위해 사랑하는 사람을 처벌함" },
+                { front: "조족", back: "지혈.", meaning: "새 발의 피라는 뜻으로, 비교할 수도 없이 아주 적은 양" },
+                { front: "과유", back: "불급.", meaning: "지나친 것은 미치지 못한 것과 같으니 중용을 지켜야 함" },
+                { front: "감언", back: "이설.", meaning: "남의 비위를 맞추거나 이익을 주겠다고 달콤하게 속이는 말" },
+                { front: "사면", back: "초가.", meaning: "아무의 도움도 받을 수 없는 고립무원의 외롭고 위태로운 처지" },
+                { front: "동문", back: "서답.", meaning: "묻는 말의 취지를 전혀 파악하지 못하고 엉뚱한 대답을 함" },
+                { front: "고진", back: "감래.", meaning: "고생 끝에 낙이 온다는 뜻으로, 힘든 일을 견디면 좋은 날이 옴" },
+                { front: "언중", back: "유골.", meaning: "겉으로 부드럽게 말하는 것 같으나 속에는 뼈가 있는 매서운 말" },
+                { front: "어부", back: "지리.", meaning: "두 사람이 싸우는 틈을 타서 제삼자가 손쉽게 이익을 가로챔" },
+                { front: "동병", back: "상련.", meaning: "같은 처지에 있는 힘든 사람들끼리 서로 가엾게 여기며 위로함" },
+                { front: "속수", back: "무책.", meaning: "손을 묶인 것처럼 어찌할 도리가 없어 대책을 세우지 못함" },
+                { front: "수수", back: "방관.", meaning: "팔짱을 끼고 쳐다만 보듯, 간섭하거나 돕지 않고 내버려 둠" }
+            ]
+        };
+
+        let currentMode = 'normal';
+        let selectedRole = ''; 
+        let availableQuestions = [];
+        let currentQuizItem = null;
+        let isAnswerRevealed = false;
+        let groupScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+
+        function selectRole(role) {
+            selectedRole = role;
+            
+            // 화면 전환
+            document.getElementById('role-screen').style.display = 'none';
+            document.getElementById('quiz-screen').style.display = 'block';
+            document.getElementById('mode-toggle-btn').style.display = 'block';
+            document.getElementById('home-btn').style.display = 'block'; // 🏠 홈 버튼 활성화
+
+            if (role === 'classroom') {
+                document.getElementById('score-board').style.display = 'grid';
+            } else {
+                document.getElementById('score-board').style.display = 'none';
+            }
+
+            resetQuizPool();
+            nextQuestion();
+        }
+
+        // 🏠 첫 화면(모드 선택)으로 돌아가는 함수 추가
+        function goHome() {
+            document.getElementById('role-screen').style.display = 'block';
+            document.getElementById('quiz-screen').style.display = 'none';
+            document.getElementById('score-board').style.display = 'none';
+            document.getElementById('mode-toggle-btn').style.display = 'none';
+            document.getElementById('home-btn').style.display = 'none'; // 홈 화면이므로 숨김
+            
+            // 돌아갈 때 모둠 점수도 깔끔하게 리셋
+            for(let i=1; i<=6; i++) {
+                groupScores[i] = 0;
+                document.getElementById(`score-${i}`).innerText = 0;
+            }
+        }
+
+        function toggleMode() {
+            const btn = document.getElementById('mode-toggle-btn');
+            if (currentMode === 'normal') {
+                currentMode = 'hard';
+                btn.innerText = "🍏 노말 버전 (초등)";
+                btn.className = "normal-btn";
+            } else {
+                currentMode = 'normal';
+                btn.innerText = "🔥 하드 버전 (중고등)";
+                btn.className = "";
+            }
+            resetQuizPool();
+            if(document.getElementById('quiz-screen').style.display !== 'none') {
+                nextQuestion();
+            }
+        }
+
+        function resetQuizPool() {
+            availableQuestions = [...quizData[currentMode]];
+        }
+
+        function nextQuestion() {
+            const totalCount = quizData[currentMode].length;
+            const remainingCount = availableQuestions.length;
+            
+            document.getElementById('quiz-progress').innerText = `남은 문제: ${remainingCount}/${totalCount}`;
+
+            if (remainingCount === 0) {
+                document.getElementById('quiz-question').innerHTML = "🎉 모든 문제를 정복했습니다! 🎉";
+                document.getElementById('quiz-meaning').classList.remove('show');
+                document.getElementById('main-action-btn').innerText = "처음부터 다시하기";
+                isAnswerRevealed = true;
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+            currentQuizItem = availableQuestions[randomIndex];
+            availableQuestions.splice(randomIndex, 1);
+
+            const badge = document.getElementById('difficulty-badge');
+            if(currentMode === 'normal') {
+                badge.innerText = "노말 (초등)";
+                badge.className = "badge normal";
+            } else {
+                badge.innerText = "하드 (중고등)";
+                badge.className = "badge hard";
+            }
+
+            document.getElementById('quiz-question').innerHTML = 
+                `${currentQuizItem.front} <span class="hidden-answer">🔍 [ ? ? ? ]</span>`;
+            
+            const meaningBox = document.getElementById('quiz-meaning');
+            meaningBox.classList.remove('show');
+            meaningBox.innerText = currentQuizItem.meaning;
+
+            document.getElementById('main-action-btn').innerText = "정답 확인";
+            isAnswerRevealed = false;
+        }
+
+        function revealAnswer() {
+            document.getElementById('quiz-question').innerHTML = 
+                `${currentQuizItem.front} <span class="revealed-answer">${currentQuizItem.back}</span>`;
+            document.getElementById('quiz-meaning').classList.add('show');
+            document.getElementById('main-action-btn').innerText = "다음 문제 ➡️";
+            isAnswerRevealed = true;
+        }
+
+        function handleNext() {
+            if (document.getElementById('main-action-btn').innerText === "처음부터 다시하기") {
+                goHome(); // 게임 완료 후 처음부터 다시하기를 눌러도 홈으로 이동
+                return;
+            }
+
+            if (!isAnswerRevealed) {
+                revealAnswer();
+            } else {
+                nextQuestion();
+            }
+        }
+
+        function changeScore(groupNum, points) {
+            groupScores[groupNum] += points;
+            document.getElementById(`score-${groupNum}`).innerText = groupScores[groupNum];
+        }
+
+        window.addEventListener('keydown', function(event) {
+            if (event.key === ' ' || event.key === 'Enter' || event.key === 'ArrowRight' || event.key === 'PageDown') {
+                if(document.getElementById('role-screen').style.display === 'none') {
+                    event.preventDefault();
+                    handleNext();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
