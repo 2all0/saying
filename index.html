@@ -299,7 +299,7 @@
 
     <button id="home-btn" onclick="goHome()">🏠 홈으로</button>
 
-    <button id="mode-toggle-btn" onclick="toggleMode()">🔥 하드 버전 (중고등)</button>
+    <button id="mode-toggle-btn" onclick="toggleMode()">🔥 하드 버전</button>
 
     <div class="quiz-container" id="role-screen">
         <h1 style="font-size: 3.5rem; margin-bottom: 10px; color: #2f3542;">💡 도전! 속담 왕</h1>
@@ -340,7 +340,7 @@
         <div id="speed-timer-display">0분 00초</div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; max-width: 250px; margin: 0 auto;">
-            <div id="difficulty-badge" class="badge normal">노말 (초등)</div>
+            <div id="difficulty-badge" class="badge normal">노말</div>
             <div id="quiz-progress" class="progress-text">남은 문제: --</div>
         </div>
         
@@ -366,7 +366,7 @@
     </div>
 
     <script>
-        // [데이터 세트] (동일 유지)
+        // [데이터 세트]
         const quizData = {
             normal: [
                 { front: "가는 말이 고와야 ", back: "오는 말이 곱다.", meaning: "내가 남에게 좋게 말해야 남도 나에게 좋게 말한다는 뜻" },
@@ -410,7 +410,7 @@
                 { front: "사공이 많으면 ", back: "배가 산으로 간다.", meaning: "주장하는 사람이 너무 많으면 일이 제대로 진행되지 않는다는 뜻" },
                 { front: "수박 ", back: "겉 핥기.", meaning: "일의 속 내용은 모르고 겉만 대충 훑어보는 것을 뜻함" },
                 { front: "식은 죽 먹듯 ", back: "한다.", meaning: "어떤 일을 하기가 아주 쉽다는 뜻" },
-                { front: "십 년이면 ", back: "강산도 변한다.", meaning: "세월이 흐르면 세상의 모든 것이 다 변하게 됨을 뜻함" },
+                { front: "십 년 공부 ", back: "아미타불.", meaning: "오랫동안 정성을 들여 쌓은 공이 한순간에 헛수고가 됨" },
                 { front: "아는 길도 ", back: "물어 가라.", meaning: "잘 아는 일이라도 조심하여 실수 없게 확인하라는 뜻" },
                 { front: "얌전한 고양이가 ", back: "부뚜막에 먼저 올라간다.", meaning: "겉으로는 얌전해 보이는 사람이 딴짓을 하거나 실속을 차림" },
                 { front: "열 번 찍어 ", back: "안 넘어가는 나무 없다.", meaning: "아무리 어려운 일도 끈기 있게 계속 노력하면 이루어진다는 뜻" },
@@ -467,7 +467,68 @@
                 { front: "발등에 ", back: "불이 떨어졌다.", meaning: "일이 몹시 급하게 닥쳐와 당장 해결해야 하는 처지" },
                 { front: "칼로 ", back: "물 베기.", meaning: "싸우거나 다투어도 아무런 흔적 없이 쉽게 화해하게 됨을 뜻함" }
             ],
-            hard: []
+            hard: [
+                { front: "가랑비에 ", back: "옷 젖는 줄 모른다.", meaning: "사소한 일이라도 자주 반복되면 무시할 수 없을 정도로 큰 결과가 됨" },
+                { front: "가문 논에 ", back: "물 대기.", meaning: "일이 매우 힘들고 재정이나 노력이 끝없이 들어감을 뜻함" },
+                { front: "간에 붙었다 ", back: "쓸개에 붙었다 한다.", meaning: "자신의 이익을 위해 주줏대 없이 이 사람 저 사람에게 아부함" },
+                { front: "계란으로 ", back: "바위 치기.", meaning: "도저히 이길 수 없거나 불가능한 일에 무모하게 도전함을 뜻함" },
+                { front: "곡식은 익을수록 ", back: "고개를 숙인다.", meaning: "교양이 있고 훌륭한 사람일수록 겸손해진다는 뜻" },
+                { front: "기지도 못하면서 ", back: "뛰려고 한다.", meaning: "기초도 없으면서 너무 어려운 단계부터 서두름을 핀잔하는 말" },
+                { front: "길고 짧은 것은 ", back: "대보아야 안다.", meaning: "이기고 지는 것은 끝까지 실제 겨루어 보아야 안다는 뜻" },
+                { front: "나무를 보지 말고 ", back: "숲을 보라.", meaning: "작은 부분에 집착하지 말고 전체적인 상황과 넓은 안목을 가지라는 뜻" },
+                { front: "낙동강 ", back: "오리알.", meaning: "무리에서 떨어져 나와 외롭고 처량하게 남겨진 신세를 뜻함" },
+                { front: "남의 떡이 ", back: "더 커 보인다.", meaning: "자신이 가진 것보다 남이 가진 것이 겉보기에 더 좋아 보임을 뜻함" },
+                { front: "내 코가 ", back: "석 자.", meaning: "내 사정이 너무 급하고 어려워서 남을 도와줄 여유가 전혀 없음" },
+                { front: "누울 자리를 보고 ", back: "발을 뻗어라.", meaning: "결과나 상황을 미리 잘 살피고 준비한 뒤에 일을 진행하라는 뜻" },
+                { front: "눈 위에서 ", back: "서리 더하기 (설상가상).", meaning: "어려운 일이 생겼는데 설상가상으로 또 곤란한 일이 겹침" },
+                { front: "달도 차면 ", back: "기운다.", meaning: "아무리 번성하고 가득 찬 세력도 시간이 흐르면 결국 쇠퇴하게 됨" },
+                { front: "닭의 대가리가 될지언정 ", back: "소의 꼬리는 되지 마라.", meaning: "작은 무리에서 우두머리가 되는 게 큰 무리의 꼴찌보다 낫다는 뜻" },
+                { front: "당달봉사 ", back: "청경 보기.", meaning: "눈을 뜨고도 사물을 제대로 분별하지 못하는 무지함을 이르는 말" },
+                { front: "도둑 맞고 ", back: "사돈 집 투덜대기.", meaning: "자신이 잘못해 손해를 보고 엉뚱한 사람을 원망함을 뜻함" },
+                { front: "돈이 ", back: "양반이다.", meaning: "재물이 있으면 세상에서 대접받고 권세를 누릴 수 있음을 꼬집는 말" },
+                { front: "돌아가는 길이 ", back: "지름길이다.", meaning: "서두르다 일을 망치기보다 원칙대로 차근차근 하는 것이 빠름" },
+                { front: "마음은 굴뚝 같으나 ", back: "능력이 없다.", meaning: "하고 싶은 간절한 욕망에 비해 실제 힘이 따르지 못함" },
+                { front: "말 타면 ", back: "경마 잡히고 싶다.", meaning: "사람의 욕심은 끝이 없어서 하나를 얻으면 더 큰 것을 원함" },
+                { front: "모기 보고 ", back: "칼 빼기.", meaning: "사소한 작은 일에 너무 크게 화를 내거나 거창하게 대처함" },
+                { front: "못 먹는 감 ", back: "찔러나 본다.", meaning: "자기가 차지하지 못할 일이라면 남도 못 하게 심술을 부림" },
+                { front: "문송합니다 ", back: "문과라서 죄송합니다.", meaning: "취업난 속 문과 학생들의 자조 섞인 신조 비유 표현" },
+                { front: "물 들어올 때 ", back: "노 저어라.", meaning: "좋은 기회가 찾아왔을 때 시기를 놓치지 말고 바짝 노력하라는 뜻" },
+                { front: "미꾸라지 한 마리가 ", back: "온 웅덩이를 흐린다.", meaning: "나쁜 사람 한 명이 집단이나 사회 전체의 분위기를 망쳐놓음" },
+                { front: "믿는 도끼에 ", back: "발등 찍힌다.", meaning: "잘될 거라고 믿었던 사람이나 일에 배신을 당해 손해를 입음" },
+                { front: "바람 앞에 ", back: "등불.", meaning: "매우 위태로운 처지에 놓여 있어 언제 망할지 모르는 상황" },
+                { front: "번개 불에 ", back: "콩 구워 먹겠다.", meaning: "일 처리가 너무 성급하거나 기회를 틈타 몹시 빠르게 행동함" },
+                { front: "벼는 익을수록 ", back: "고개를 숙인다.", meaning: "학식과 덕망이 높은 사람일수록 더 겸손하고 낮아짐을 뜻함" },
+                { front: "부엉이 ", back: "집 같다.", meaning: "물건이 이것저것 마구 뒤섞여 매우 어수선하고 지저분한 곳" },
+                { front: "불난 집에 ", back: "부채질한다.", meaning: "곤경에 처한 사람을 도와주기는커녕 사태를 더 악화시킴" },
+                { front: "비단옷 입고 ", back: "밤길 가기.", meaning: "아무리 훌륭한 일을 해도 알아주는 사람이 없어 보람이 없음" },
+                { front: "빛 좋은 ", back: "개살구.", meaning: "겉모양만 그럴듯하고 실제 내용이나 실속은 하나도 없음" },
+                { front: "뺨 맞아도 ", back: "은가락지 낀 손이 낫다.", meaning: "모욕이나 고난을 당하더라도 값비싼 보상이나 이득이 있는 게 좋음" },
+                { front: "소 뒷걸음질 치다 ", back: "쥐 잡기.", meaning: "아무런 의도 없이 우연히 행동하다가 뜻밖에 큰 성과를 거둠" },
+                { front: "송충이는 ", back: "갈잎을 먹어야 한다.", meaning: "자신의 분수에 맞게 행동해야지 분에 넘치는 욕심을 내면 안 됨" },
+                { front: "쇠뿔도 ", back: "단김에 빼라.", meaning: "어떤 일을 하려고 마음먹었으면 망설이지 말고 바로 처리하라" },
+                { front: "수풀 속에서 ", back: "호랑이 찾기.", meaning: "실마리나 가능성이 전혀 없는 곳에서 헛되이 고생함을 뜻함" },
+                { front: "신선놀음에 ", back: "시간 가는 줄 모른다.", meaning: "너무 즐겁고 재미있는 일에 빠져 세월을 잊어버림을 뜻함" },
+                { front: "아랫돌 빼서 ", back: "윗글 고치기 (하석상대).", meaning: "임시변통으로 한 곳의 문제를 다른 곳의 손해로 메우는 어리석음" },
+                { front: "양지가 ", back: "음지 되고 음지가 양지 된다.", meaning: "세상 형편은 돌고 도는 것이라 영원한 강자도 약자도 없음" },
+                { front: "어물전 망신은 ", back: "꼴뚜기가 시킨다.", meaning: "집단 내의 미꾸라지 같은 한 사람이 전체의 격을 떨어뜨림" },
+                { front: "열 길 물속은 알아도 ", back: "한 길 사람 속은 모른다.", meaning: "사람의 마음은 깊고 복잡하여 겉으로 보고는 절대 알 수 없음" },
+                { front: "오르지 못할 나무는 ", back: "쳐다보지도 마라.", meaning: "자신의 한계나 분수를 알고 터무니없는 욕심은 버리라는 뜻" },
+                { front: "오소리 ", back: "굴 연기 피우듯.", meaning: "남을 괴롭히거나 곤경에 빠뜨리기 위해 잔꾀를 부림을 뜻함" },
+                { front: "우물 안 ", back: "개구리.", meaning: "넓은 세상을 보지 못하고 좁은 소견으로 자만하는 사람을 비유" },
+                { front: "울며 ", back: "겨자 먹기.", meaning: "하고 싶지 않은 일을 억지로나 의무감 때문에 어쩔 수 없이 함" },
+                { front: "원수는 ", back: "외나무다리에서 만난다.", meaning: "피하고 싶은 사람이나 곤란한 상황을 가장 좁은 외통수에서 만남" },
+                { front: "이 빠진 ", back: "호랑이.", meaning: "한때는 강력한 권세를 가졌으나 지금은 힘을 잃고 초라해진 신세" },
+                { front: "인과 ", back: "응보.", meaning: "좋은 원인에는 좋은 결과가, 나쁜 원인에는 나쁜 결과가 따름" },
+                { front: "재수 없는 놈은 ", back: "뒤로 자빠져도 코가 깨진다.", meaning: "일이 안 풀리려고 하면 아주 이상하고 사소한 일로도 화를 입음" },
+                { front: "절이 싫으면 ", back: "중이 떠나야 한다.", meaning: "집단이나 시스템이 마음에 안 들면 본인이 스스로 떠나는 게 맞음" },
+                { front: "조 조각에 ", back: "배 떨어진다.", meaning: "우연한 일치로 오해나 혐의를 받게 됨을 이르는 어려운 표현" },
+                { front: "지성이면 ", back: "감천이다.", meaning: "지극한 정성을 들이면 하늘도 감동하여 좋은 결과를 준다는 뜻" },
+                { front: "진흙 속에서 ", back: "진주 캐기.", meaning: "어렵고 열악한 환경 속에서 뛰어난 인재나 보물을 찾아냄" },
+                { front: "평안감사도 ", back: "저 싫으면 그만이다.", meaning: "아무리 좋은 조건이나 높은 지위라도 본인이 하기 싫으면 소용없음" },
+                { front: "하늘의 ", back: "별 따기.", meaning: "가능성이 거의 희박하고 성취하기가 매우 어려운 일을 비유" },
+                { front: "한 치 앞을 ", back: "모른다.", meaning: "미래나 다가올 일은 한순간도 예측하기 어려울 만큼 불확실함" },
+                { front: "황소뒷걸음치다 ", back: "쥐잡기.", meaning: "우연히 행동했다가 생각지도 못한 행운이나 성과를 보게 됨" }
+            ]
         };
 
         // 변수 관리
@@ -494,10 +555,9 @@
             document.getElementById('home-btn').style.display = 'block'; 
 
             if (role === 'speed') {
-                currentMode = 'normal';
-                if (availableQuestions.length === 0) {
-                    resetQuizPool();
-                }
+                // 스피드 퀴즈는 무조건 노말 문제 풀로 고정
+                availableQuestions = [...quizData['normal']];
+                
                 document.getElementById('speed-group-screen').style.display = 'block';
                 document.getElementById('quiz-screen').style.display = 'none';
                 document.getElementById('score-board').style.display = 'none';
@@ -550,7 +610,6 @@
             meaningBox.style.flexDirection = "column";
             meaningBox.style.gap = "20px";
             
-            // 대기화면 전용 HTML (분, 초 각각 나누어 배치한 인풋)
             meaningBox.innerHTML = `
                 <div class="timer-setup">
                     ⏱️ 제한 시간 설정:
@@ -629,8 +688,6 @@
 
             const randomIndex = Math.floor(Math.random() * availableQuestions.length);
             currentQuizItem = availableQuestions[randomIndex];
-            
-            // 문제 선택 후 문제 풀에서 일단 제외
             availableQuestions.splice(randomIndex, 1);
 
             document.getElementById('quiz-question').innerHTML = 
@@ -642,12 +699,12 @@
             meaningBox.innerText = currentQuizItem.meaning;
         }
 
-        // [스피드 퀴즈 정답 / 패스 판정 처리] ★ 패스 로직 대폭 수정 ★
+        // [스피드 퀴즈 정답 / 패스 판정 처리]
         function handleSpeedResult(isCorrect) {
             if (isCorrect) {
                 speedGroupScores[currentSpeedGroup] += 1;
             } else {
-                // ❌ 패스를 누른 경우: 현재 출제된 문제를 다시 문제 풀 배열의 끝에 집어넣어 살려둡니다.
+                // ❌ 패스: 배열 끝에 다시 넣기
                 if (currentQuizItem) {
                     availableQuestions.push(currentQuizItem);
                 }
@@ -692,6 +749,7 @@
             document.getElementById('speed-timer-display').style.display = 'none';
             
             currentSpeedGroup = null;
+            currentMode = 'normal'; 
 
             for(let i=1; i<=6; i++) {
                 groupScores[i] = 0;
@@ -706,11 +764,11 @@
             const btn = document.getElementById('mode-toggle-btn');
             if (currentMode === 'normal') {
                 currentMode = 'hard';
-                btn.innerText = "🍏 노말 버전 (초등)";
+                btn.innerText = "🍏 노말 버전";
                 btn.className = "normal-btn";
             } else {
                 currentMode = 'normal';
-                btn.innerText = "🔥 하드 버전 (중고등)";
+                btn.innerText = "🔥 하드 버전";
                 btn.className = "";
             }
             resetQuizPool();
@@ -743,10 +801,10 @@
 
             const badge = document.getElementById('difficulty-badge');
             if(currentMode === 'normal') {
-                badge.innerText = "노말 (초등)";
+                badge.innerText = "노말";
                 badge.className = "badge normal";
             } else {
-                badge.innerText = "하드 (중고등)";
+                badge.innerText = "하드";
                 badge.className = "badge hard";
             }
 
